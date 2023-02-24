@@ -1,0 +1,29 @@
+原理：将隐藏单元解耦为interface和latent向量，并且反复迭代计算，使得自适应分配计算资源，关注更多有信息的画面和内容
+文章贡献总结：
+1.设计了基于内容资源分配架构，权衡了复杂结构和简单结构的计算消耗
+2.在递归计算中用了潜在自条件计算来分摊计算消耗
+
+递归迭代生成的diffusion methods
+latent self-conditioning过程
+文章使用了 read 到 process再到write的过程，多次反复迭代
+首先对latents和interface初始化，
+read是用cross-attention+mlp
+process:self-attention+mlp共迭代k次
+write使用cross-attention+mlp
+
+ 
+
+采样使用ddpm 或者ddim，进而进行训练和基于上述的latent self-conditioning过程采样
+
+训练过程，self-conditoning会用去噪网络预估latents，后面进而基于之前的迭代结果；预测过程，在采样时，直接使latents初始为0，后面在基于之前的结果迭代
+因而latent self-conditioning 需要有个warm-starting latents，这是基于可学习的embedding
+
+消融实验
+1.rate of self-conditioning 随着增大，fid就越小，is就越大，生成质量越高
+2.多个循环的read-wirtes的递归迭代有利于生成质量的提高
+3.使用适当温度的sigmoid噪音调节器好于cosine噪音调节器
+
+
+本框架比u-net取得更好的效果，recurrent interface networds是未来的生成模型的有力竞争者，可以结合latent diffusion和图像文本条件guidance的生成
+
+
